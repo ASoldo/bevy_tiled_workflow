@@ -1,5 +1,4 @@
 use avian3d::prelude::*;
-
 use bevy::{
     color::palettes::tailwind::{BLUE_500, GREEN_500},
     prelude::*,
@@ -91,6 +90,7 @@ fn main() {
             MaterialPlugin::<CustomMaterial>::default(),
             WorldInspectorPlugin::default(),
         ))
+        // .add_plugins(TiledMapPlugin)
         .init_state::<GameState>()
         // .insert_state(GameState::Game)
         .add_systems(Startup, setup)
@@ -114,10 +114,60 @@ fn main() {
         .run();
 }
 
+#[derive(Component)]
+struct Tile {
+    id: u32,
+}
+fn draw_map(commands: &mut Commands, tileset_handle: Handle<Image>, tileset_size: Vec2) {
+    let tile_size = Vec2::new(MAP.tilewidth as f32, MAP.tileheight as f32);
+
+    for layer in &MAP.layers {
+        for (y, row) in layer.data.chunks(MAP.width as usize).enumerate() {
+            for (x, &tile_id) in row.iter().enumerate() {
+                if tile_id == 0 {
+                    continue; // Skip empty tiles
+                }
+
+                let tile_position =
+                    Vec3::new(x as f32 * tile_size.x, -(y as f32 * tile_size.y), 0.0);
+
+                let tiles_per_row = (tileset_size.x / tile_size.x) as u32;
+                let tile_column = (tile_id - 1) % tiles_per_row;
+                let tile_row = (tile_id - 1) / tiles_per_row;
+
+                let rect_min = Vec2::new(
+                    tile_column as f32 * tile_size.x,
+                    tile_row as f32 * tile_size.y,
+                );
+                let rect_max = rect_min + tile_size;
+
+                commands
+                    .spawn(SpriteBundle {
+                        texture: tileset_handle.clone(),
+                        sprite: Sprite {
+                            custom_size: Some(tile_size),
+                            rect: Some(Rect {
+                                min: rect_min,
+                                max: rect_max,
+                            }),
+                            ..Default::default()
+                        },
+                        transform: Transform {
+                            translation: tile_position,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    })
+                    .insert(Tile { id: tile_id });
+            }
+        }
+    }
+}
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<CustomMaterial>>,
+    server: Res<AssetServer>,
 ) {
     println!("{:?}", *MAP);
 
@@ -126,52 +176,55 @@ fn setup(
     for layer in &MAP.layers {
         println!("{:?}", layer.data);
     }
+    let tileset_handle: Handle<Image> = server.load("../assets/images/tileset1.png");
+    draw_map(&mut commands, tileset_handle, Vec2::new(200.0, 200.0));
     // generated_function();
     // Static physics object with a collision shape
-    commands.spawn((
-        RigidBody::Static,
-        Collider::cylinder(4.0, 0.1),
-        MaterialMeshBundle {
-            mesh: meshes.add(Cylinder::new(4.0, 0.1)),
-            material: materials.add(CustomMaterial {}),
-            ..default()
-        },
-    ));
-
-    // Dynamic physics object with a collision shape and initial angular velocity
-    commands.spawn((
-        PositionComponent {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        },
-        Name::new("Kocka"),
-        RigidBody::Dynamic,
-        Collider::cuboid(1.0, 1.0, 1.0),
-        AngularVelocity(Vec3::new(2.5, 3.5, 1.5)),
-        MaterialMeshBundle {
-            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-            material: materials.add(CustomMaterial {}),
-            transform: Transform::from_xyz(0.0, 4.0, 0.0),
-            ..default()
-        },
-    ));
-
-    // Light
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            shadows_enabled: true,
-            ..default()
-        },
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..default()
-    });
-
-    // Camera
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(-2.5, 4.5, 9.0).looking_at(Vec3::ZERO, Dir3::Y),
-        ..default()
-    });
+    // commands.spawn((
+    //     RigidBody::Static,
+    //     Collider::cylinder(4.0, 0.1),
+    //     MaterialMeshBundle {
+    //         mesh: meshes.add(Cylinder::new(4.0, 0.1)),
+    //         material: materials.add(CustomMaterial {}),
+    //         ..default()
+    //     },
+    // ));
+    //
+    // // Dynamic physics object with a collision shape and initial angular velocity
+    // commands.spawn((
+    //     PositionComponent {
+    //         x: 0.0,
+    //         y: 0.0,
+    //         z: 0.0,
+    //     },
+    //     Name::new("Kocka"),
+    //     RigidBody::Dynamic,
+    //     Collider::cuboid(1.0, 1.0, 1.0),
+    //     AngularVelocity(Vec3::new(2.5, 3.5, 1.5)),
+    //     MaterialMeshBundle {
+    //         mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
+    //         material: materials.add(CustomMaterial {}),
+    //         transform: Transform::from_xyz(0.0, 4.0, 0.0),
+    //         ..default()
+    //     },
+    // ));
+    //
+    // // Light
+    // commands.spawn(PointLightBundle {
+    //     point_light: PointLight {
+    //         shadows_enabled: true,
+    //         ..default()
+    //     },
+    //     transform: Transform::from_xyz(4.0, 8.0, 4.0),
+    //     ..default()
+    // });
+    //
+    // // Camera
+    // commands.spawn(Camera3dBundle {
+    //     transform: Transform::from_xyz(-2.5, 4.5, 9.0).looking_at(Vec3::ZERO, Dir3::Y),
+    //     ..default()
+    // });
+    commands.spawn(Camera2dBundle::default());
 }
 
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
