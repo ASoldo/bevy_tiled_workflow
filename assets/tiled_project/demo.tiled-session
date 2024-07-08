@@ -1,0 +1,26 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+    },
+    "last.exportedFilePath": "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/exports",
+    "last.imagePath": "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/images",
+    "map.lastUsedExportFilter": "Tiled map files (*.tmx *.xml)",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+    ],
+    "project": "demo.tiled-project",
+    "property.type": "int",
+    "recentFiles": [
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 20,
+        "width": 20
+    }
+}
