@@ -1,3 +1,5 @@
+![image](https://github.com/ASoldo/bevy_tiled_workflow/assets/1175537/a2095402-1ffe-4a1a-b73d-821c55a86c4e)
+
 # Bevy TMX Map Parser and Code Generator
 
 This project demonstrates how to parse a TMX file, generate corresponding Rust code, and integrate it into a Bevy game. The generated code is written to a file during the build process and can be used within the main game code.
