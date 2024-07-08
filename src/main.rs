@@ -3,7 +3,8 @@ use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 include!(concat!(env!("OUT_DIR"), "/generated_code.rs"));
 
-#[derive(Component)]
+#[derive(Component, Reflect, Resource, Default)]
+#[reflect(Resource)]
 struct Tile {
     id: u32,
 }
@@ -11,6 +12,8 @@ struct Tile {
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, WorldInspectorPlugin::default()))
+        .init_resource::<Tile>()
+        .register_type::<Tile>()
         .add_systems(Startup, setup)
         .run();
 }
