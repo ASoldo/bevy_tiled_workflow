@@ -27,7 +27,7 @@ fn draw_map(commands: &mut Commands, tileset_handle: Handle<Image>, tileset_size
     for layer in &MAP.layers {
         for (y, row) in layer.data.chunks(MAP.width as usize).enumerate() {
             for (x, &tile_id) in row.iter().enumerate() {
-                if tile_id == 96 {
+                if tile_id >= 96 {
                     continue; // Skip empty tiles
                 }
 
