@@ -11,7 +11,10 @@ struct Tile {
 
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins, WorldInspectorPlugin::default()))
+        .add_plugins((
+            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            WorldInspectorPlugin::default(),
+        ))
         .init_resource::<Tile>()
         .register_type::<Tile>()
         .add_systems(Startup, setup)
