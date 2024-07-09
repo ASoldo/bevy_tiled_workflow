@@ -3,20 +3,36 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx",
     "expandedProjectPaths": [
     ],
     "fileStates": {
+        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/maps/map1.tmx": {
+            "scale": 1.7119791666666666,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.14602981442056,
+                "y": 249.7109826589596
+            }
+        },
+        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        }
     },
     "last.exportedFilePath": "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/exports",
     "last.imagePath": "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/images",
     "map.lastUsedExportFilter": "Tiled map files (*.tmx *.xml)",
     "map.lastUsedFormat": "tmx",
     "openFiles": [
+        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/maps/map1.tmx",
+        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx"
     ],
     "project": "demo.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/maps/map1.tmx",
+        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

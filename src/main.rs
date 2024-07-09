@@ -21,9 +21,11 @@ fn main() {
         .run();
 }
 
-fn draw_map(commands: &mut Commands, tileset_handle: Handle<Image>, tileset_size: Vec2) {
+fn draw_map(commands: &mut Commands, server: Res<AssetServer>, tileset_size: Vec2) {
     let tile_size = Vec2::new(MAP.tilewidth as f32, MAP.tileheight as f32);
 
+    let tileset_path = &MAP.tilesets[0].image_source.clone();
+    let tileset_handle: Handle<Image> = server.load(tileset_path);
     for layer in &MAP.layers {
         for (y, row) in layer.data.chunks(MAP.width as usize).enumerate() {
             for (x, &tile_id) in row.iter().enumerate() {
@@ -75,8 +77,8 @@ fn setup(mut commands: Commands, server: Res<AssetServer>) {
     for layer in &MAP.layers {
         println!("{:?}", layer.data);
     }
-    let tileset_handle: Handle<Image> = server.load("../assets/images/tileset1.png");
-    draw_map(&mut commands, tileset_handle, Vec2::new(200.0, 200.0));
+
+    draw_map(&mut commands, server, Vec2::new(200.0, 200.0));
 
     commands.spawn(Camera2dBundle::default());
 }

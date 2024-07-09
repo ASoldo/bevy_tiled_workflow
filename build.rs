@@ -13,6 +13,7 @@ use xml::reader::{EventReader, XmlEvent};
 struct Tileset {
     first_gid: u32,
     source: String,
+    image_source: String,
 }
 
 #[derive(Debug, Clone)]
@@ -87,7 +88,12 @@ fn parse_tmx_file(file_path: &str) -> Map {
                             _ => {}
                         }
                     }
-                    map.tilesets.push(Tileset { first_gid, source });
+                    let image_source = parse_tsx_file(&source);
+                    map.tilesets.push(Tileset {
+                        first_gid,
+                        source,
+                        image_source,
+                    });
                 }
                 "layer" => {
                     for attr in attributes {
@@ -135,6 +141,44 @@ fn parse_tmx_file(file_path: &str) -> Map {
     map
 }
 
+fn parse_tsx_file(file_path: &str) -> String {
+    let path = PathBuf::from("assets/tilesets").join(file_path);
+    let mut file = File::open(path).expect("Unable to open tsx file");
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)
+        .expect("Unable to read tsx file");
+
+    let parser = EventReader::new(contents.as_bytes());
+    let mut image_source = String::new();
+
+    for e in parser {
+        match e {
+            Ok(XmlEvent::StartElement {
+                name, attributes, ..
+            }) => {
+                if name.local_name == "image" {
+                    for attr in attributes {
+                        if attr.name.local_name == "source" {
+                            image_source = attr.value.clone();
+                            // Remove leading "../" if it exists
+                            if image_source.starts_with("../") {
+                                image_source = image_source[3..].to_string();
+                            }
+                        }
+                    }
+                }
+            }
+            Err(e) => {
+                println!("Error: {}", e);
+                break;
+            }
+            _ => {}
+        }
+    }
+
+    image_source
+}
+
 fn main() {
     let out_dir = env::var("OUT_DIR").unwrap();
     let dest_path = PathBuf::from(out_dir).join("generated_code.rs");
@@ -147,8 +191,9 @@ fn main() {
         .map(|tileset| {
             let first_gid = tileset.first_gid;
             let source = &tileset.source;
+            let image_source = &tileset.image_source;
             quote! {
-                Tileset { first_gid: #first_gid, source: #source.to_string() }
+                Tileset { first_gid: #first_gid, source: #source.to_string(), image_source: #image_source.to_string() }
             }
         })
         .collect();
@@ -186,6 +231,7 @@ fn main() {
         struct Tileset {
             first_gid: u32,
             source: String,
+            image_source: String,
         }
 
         #[derive(Debug, Clone)]
