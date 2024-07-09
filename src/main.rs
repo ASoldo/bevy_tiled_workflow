@@ -12,6 +12,7 @@ struct Tile {
 #[reflect(Resource)]
 struct MapObject {
     id: u32,
+    class: String,
 }
 
 fn main() {
@@ -84,7 +85,7 @@ fn draw_map(commands: &mut Commands, server: Res<AssetServer>, tileset_size: Vec
             commands
                 .spawn(SpriteBundle {
                     sprite: Sprite {
-                        color: Color::rgba(1.0, 0.0, 0.0, 0.5),
+                        color: Color::srgba(1.0, 0.0, 0.0, 0.5),
                         custom_size: Some(Vec2::new(20.0, 20.0)), // Assuming each object is 20x20
                         ..Default::default()
                     },
@@ -94,7 +95,10 @@ fn draw_map(commands: &mut Commands, server: Res<AssetServer>, tileset_size: Vec
                     },
                     ..Default::default()
                 })
-                .insert(MapObject { id: object.id });
+                .insert(MapObject {
+                    id: object.id.clone(),
+                    class: object.class.clone(),
+                });
         }
     }
 }

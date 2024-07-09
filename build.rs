@@ -28,6 +28,7 @@ struct Layer {
 #[derive(Debug, Clone)]
 struct Object {
     id: u32,
+    class: String,
     x: f32,
     y: f32,
 }
@@ -36,6 +37,7 @@ struct Object {
 struct ObjectGroup {
     id: u32,
     name: String,
+    class: String,
     objects: Vec<Object>,
 }
 
@@ -79,11 +81,13 @@ fn parse_tmx_file(file_path: &str) -> Map {
     let mut current_object_group = ObjectGroup {
         id: 0,
         name: String::new(),
+        class: String::new(),
         objects: Vec::new(),
     };
 
     let mut current_object = Object {
         id: 0,
+        class: String::new(),
         x: 0.0,
         y: 0.0,
     };
@@ -145,6 +149,7 @@ fn parse_tmx_file(file_path: &str) -> Map {
                         match attr.name.local_name.as_str() {
                             "id" => current_object_group.id = attr.value.parse().unwrap(),
                             "name" => current_object_group.name = attr.value.clone(),
+                            "class" => current_object_group.class = attr.value.clone(),
                             _ => {}
                         }
                     }
@@ -156,6 +161,7 @@ fn parse_tmx_file(file_path: &str) -> Map {
                             "id" => current_object.id = attr.value.parse().unwrap(),
                             "x" => current_object.x = attr.value.parse().unwrap(),
                             "y" => current_object.y = attr.value.parse().unwrap(),
+                            "type" => current_object.class = attr.value.clone(),
                             _ => {}
                         }
                     }
@@ -185,6 +191,7 @@ fn parse_tmx_file(file_path: &str) -> Map {
                     current_object_group = ObjectGroup {
                         id: 0,
                         name: String::new(),
+                        class: String::new(),
                         objects: Vec::new(),
                     };
                 } else if name.local_name == "object" {
@@ -192,6 +199,7 @@ fn parse_tmx_file(file_path: &str) -> Map {
                     current_object_group.objects.push(current_object.clone());
                     current_object = Object {
                         id: 0,
+                        class: String::new(),
                         x: 0.0,
                         y: 0.0,
                     };
@@ -292,15 +300,17 @@ fn main() {
         .map(|object_group| {
             let id = object_group.id;
             let name = &object_group.name;
+            let class = &object_group.class;
             let objects: Vec<TokenStream> = object_group
                 .objects
                 .iter()
                 .map(|object| {
                     let obj_id = object.id;
+                    let class = &object.class;
                     let x = object.x;
                     let y = object.y;
                     quote! {
-                        Object { id: #obj_id, x: #x, y: #y }
+                        Object { id: #obj_id, class: #class.to_string(), x: #x, y: #y }
                     }
                 })
                 .collect();
@@ -308,6 +318,7 @@ fn main() {
                 ObjectGroup {
                     id: #id,
                     name: #name.to_string(),
+                    class: #class.to_string(),
                     objects: vec![#(#objects),*],
                 }
             }
@@ -341,6 +352,7 @@ fn main() {
         #[derive(Debug, Clone)]
         struct Object {
             id: u32,
+            class: String,
             x: f32,
             y: f32,
         }
@@ -349,6 +361,7 @@ fn main() {
         struct ObjectGroup {
             id: u32,
             name: String,
+            class: String,
             objects: Vec<Object>,
         }
 

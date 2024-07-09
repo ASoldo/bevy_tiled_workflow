@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx",
+    "activeFile": "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/maps/map1.tmx",
     "expandedProjectPaths": [
     ],
     "fileStates": {
@@ -11,8 +11,8 @@
             "scale": 1.7119791666666666,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 480.14602981442056,
-                "y": 249.7109826589596
+                "x": 256.4283541223,
+                "y": 172.60724064496506
             }
         },
         "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx": {
@@ -31,8 +31,8 @@
     "project": "demo.tiled-project",
     "property.type": "object",
     "recentFiles": [
-        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/maps/map1.tmx",
-        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx"
+        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx",
+        "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/maps/map1.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

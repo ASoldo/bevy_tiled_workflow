@@ -28,19 +28,19 @@
 75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75,75
 </data>
  </layer>
- <objectgroup id="2" name="StartPosition">
+ <objectgroup id="2" name="StartPosition" class="Objective">
   <properties>
    <property name="some_object" type="object" value="4"/>
    <property name="x" type="int" value="1"/>
    <property name="y" type="int" value="1"/>
   </properties>
-  <object id="9" name="Start Position" gid="67" x="20" y="140" width="20" height="20"/>
+  <object id="9" name="Start Position" type="Objective" gid="67" x="20" y="140" width="20" height="20"/>
  </objectgroup>
- <objectgroup id="5" name="Potion">
-  <object id="8" name="Potion" gid="66" x="260" y="180" width="20" height="20"/>
+ <objectgroup id="5" name="Potion" class="Item">
+  <object id="8" name="Potion" type="Item" gid="66" x="260" y="180" width="20" height="20"/>
  </objectgroup>
- <objectgroup id="4" name="Chest">
-  <object id="10" name="Chest" gid="23" x="320" y="260" width="20" height="20"/>
+ <objectgroup id="4" name="DragonChest" class="Chest">
+  <object id="10" name="Chest" type="Chest" gid="23" x="320" y="260" width="20" height="20"/>
  </objectgroup>
  <layer id="7" name="Tile Layer 2" width="30" height="20">
   <data encoding="csv">
