@@ -25,6 +25,20 @@ struct Layer {
     data: Vec<u32>,
 }
 
+#[derive(Debug, Clone)]
+struct Object {
+    id: u32,
+    x: f32,
+    y: f32,
+}
+
+#[derive(Debug, Clone)]
+struct ObjectGroup {
+    id: u32,
+    name: String,
+    objects: Vec<Object>,
+}
+
 #[derive(Debug)]
 struct Map {
     width: u32,
@@ -33,6 +47,7 @@ struct Map {
     tileheight: u32,
     tilesets: Vec<Tileset>,
     layers: Vec<Layer>,
+    object_groups: Vec<ObjectGroup>,
 }
 
 fn parse_tmx_file(file_path: &str) -> Map {
@@ -50,6 +65,7 @@ fn parse_tmx_file(file_path: &str) -> Map {
         tileheight: 0,
         tilesets: Vec::new(),
         layers: Vec::new(),
+        object_groups: Vec::new(),
     };
 
     let mut current_layer = Layer {
@@ -60,7 +76,21 @@ fn parse_tmx_file(file_path: &str) -> Map {
         data: Vec::new(),
     };
 
+    let mut current_object_group = ObjectGroup {
+        id: 0,
+        name: String::new(),
+        objects: Vec::new(),
+    };
+
+    let mut current_object = Object {
+        id: 0,
+        x: 0.0,
+        y: 0.0,
+    };
+
     let mut in_layer_data = false;
+    let mut in_object_group = false;
+    let mut in_object = false;
 
     for e in parser {
         match e {
@@ -109,6 +139,27 @@ fn parse_tmx_file(file_path: &str) -> Map {
                 "data" => {
                     in_layer_data = true;
                 }
+                "objectgroup" => {
+                    in_object_group = true;
+                    for attr in attributes {
+                        match attr.name.local_name.as_str() {
+                            "id" => current_object_group.id = attr.value.parse().unwrap(),
+                            "name" => current_object_group.name = attr.value.clone(),
+                            _ => {}
+                        }
+                    }
+                }
+                "object" => {
+                    in_object = true;
+                    for attr in attributes {
+                        match attr.name.local_name.as_str() {
+                            "id" => current_object.id = attr.value.parse().unwrap(),
+                            "x" => current_object.x = attr.value.parse().unwrap(),
+                            "y" => current_object.y = attr.value.parse().unwrap(),
+                            _ => {}
+                        }
+                    }
+                }
                 _ => {}
             },
             Ok(XmlEvent::Characters(data)) => {
@@ -127,6 +178,22 @@ fn parse_tmx_file(file_path: &str) -> Map {
                         width: 0,
                         height: 0,
                         data: Vec::new(),
+                    };
+                } else if name.local_name == "objectgroup" {
+                    in_object_group = false;
+                    map.object_groups.push(current_object_group.clone());
+                    current_object_group = ObjectGroup {
+                        id: 0,
+                        name: String::new(),
+                        objects: Vec::new(),
+                    };
+                } else if name.local_name == "object" {
+                    in_object = false;
+                    current_object_group.objects.push(current_object.clone());
+                    current_object = Object {
+                        id: 0,
+                        x: 0.0,
+                        y: 0.0,
                     };
                 }
             }
@@ -219,6 +286,34 @@ fn main() {
         })
         .collect();
 
+    let object_groups: Vec<TokenStream> = map
+        .object_groups
+        .iter()
+        .map(|object_group| {
+            let id = object_group.id;
+            let name = &object_group.name;
+            let objects: Vec<TokenStream> = object_group
+                .objects
+                .iter()
+                .map(|object| {
+                    let obj_id = object.id;
+                    let x = object.x;
+                    let y = object.y;
+                    quote! {
+                        Object { id: #obj_id, x: #x, y: #y }
+                    }
+                })
+                .collect();
+            quote! {
+                ObjectGroup {
+                    id: #id,
+                    name: #name.to_string(),
+                    objects: vec![#(#objects),*],
+                }
+            }
+        })
+        .collect();
+
     let map_width = map.width;
     let map_height = map.height;
     let map_tilewidth = map.tilewidth;
@@ -227,7 +322,7 @@ fn main() {
     let generated_code = quote! {
         use once_cell::sync::Lazy;
 
-        #[derive(Debug)]
+        #[derive(Debug, Clone)]
         struct Tileset {
             first_gid: u32,
             source: String,
@@ -243,6 +338,20 @@ fn main() {
             data: Vec<u32>,
         }
 
+        #[derive(Debug, Clone)]
+        struct Object {
+            id: u32,
+            x: f32,
+            y: f32,
+        }
+
+        #[derive(Debug, Clone)]
+        struct ObjectGroup {
+            id: u32,
+            name: String,
+            objects: Vec<Object>,
+        }
+
         #[derive(Debug)]
         struct Map {
             width: u32,
@@ -251,6 +360,7 @@ fn main() {
             tileheight: u32,
             tilesets: Vec<Tileset>,
             layers: Vec<Layer>,
+            object_groups: Vec<ObjectGroup>,
         }
 
         static MAP: Lazy<Map> = Lazy::new(|| Map {
@@ -260,6 +370,7 @@ fn main() {
             tileheight: #map_tileheight,
             tilesets: vec![#(#tilesets),*],
             layers: vec![#(#layers),*],
+            object_groups: vec![#(#object_groups),*],
         });
     };
 

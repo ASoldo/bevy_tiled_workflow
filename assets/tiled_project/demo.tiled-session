@@ -29,7 +29,7 @@
         "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx"
     ],
     "project": "demo.tiled-project",
-    "property.type": "int",
+    "property.type": "object",
     "recentFiles": [
         "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/maps/map1.tmx",
         "/home/rootster/Documents/bevy_projects/bevy_0_14_0/bevy_learning/assets/tilesets/Demo.tsx"

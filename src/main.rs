@@ -1,11 +1,16 @@
+use bevy::color::Srgba;
 use bevy::prelude::*;
-
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 include!(concat!(env!("OUT_DIR"), "/generated_code.rs"));
 
 #[derive(Component, Reflect, Resource, Default)]
 #[reflect(Resource)]
 struct Tile {
+    id: u32,
+}
+
+#[derive(Component)]
+struct MapObject {
     id: u32,
 }
 
@@ -65,6 +70,25 @@ fn draw_map(commands: &mut Commands, server: Res<AssetServer>, tileset_size: Vec
                     })
                     .insert(Tile { id: tile_id });
             }
+        }
+    }
+
+    for object_group in &MAP.object_groups {
+        for object in &object_group.objects {
+            commands
+                .spawn(SpriteBundle {
+                    sprite: Sprite {
+                        color: Color::srgba(1.0, 0.0, 0.0, 0.5),
+                        custom_size: Some(Vec2::new(20.0, 20.0)),
+                        ..Default::default()
+                    },
+                    transform: Transform {
+                        translation: Vec3::new(object.x, -object.y, 1.0), // Adjust as needed
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                })
+                .insert(MapObject { id: object.id });
         }
     }
 }
