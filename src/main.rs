@@ -1,4 +1,3 @@
-use bevy::color::Srgba;
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 include!(concat!(env!("OUT_DIR"), "/generated_code.rs"));
@@ -9,7 +8,8 @@ struct Tile {
     id: u32,
 }
 
-#[derive(Component)]
+#[derive(Component, Reflect, Resource, Default)]
+#[reflect(Resource)]
 struct MapObject {
     id: u32,
 }
@@ -21,7 +21,9 @@ fn main() {
             WorldInspectorPlugin::default(),
         ))
         .init_resource::<Tile>()
+        .init_resource::<MapObject>()
         .register_type::<Tile>()
+        .register_type::<MapObject>()
         .add_systems(Startup, setup)
         .run();
 }
@@ -31,15 +33,18 @@ fn draw_map(commands: &mut Commands, server: Res<AssetServer>, tileset_size: Vec
 
     let tileset_path = &MAP.tilesets[0].image_source.clone();
     let tileset_handle: Handle<Image> = server.load(tileset_path);
-    for layer in &MAP.layers {
+    for (layer_index, layer) in MAP.layers.iter().enumerate() {
         for (y, row) in layer.data.chunks(MAP.width as usize).enumerate() {
             for (x, &tile_id) in row.iter().enumerate() {
-                if tile_id >= 96 {
+                if tile_id == 0 || tile_id >= 96 {
                     continue; // Skip empty tiles
                 }
 
-                let tile_position =
-                    Vec3::new(x as f32 * tile_size.x, -(y as f32 * tile_size.y), 0.0);
+                let tile_position = Vec3::new(
+                    x as f32 * tile_size.x,
+                    -(y as f32 * tile_size.y),
+                    layer_index as f32,
+                );
 
                 let tiles_per_row = (tileset_size.x / tile_size.x) as u32;
                 let tile_column = (tile_id - 1) % tiles_per_row;
@@ -73,17 +78,18 @@ fn draw_map(commands: &mut Commands, server: Res<AssetServer>, tileset_size: Vec
         }
     }
 
+    // Draw objects after layers
     for object_group in &MAP.object_groups {
         for object in &object_group.objects {
             commands
                 .spawn(SpriteBundle {
                     sprite: Sprite {
-                        color: Color::srgba(1.0, 0.0, 0.0, 0.5),
-                        custom_size: Some(Vec2::new(20.0, 20.0)),
+                        color: Color::rgba(1.0, 0.0, 0.0, 0.5),
+                        custom_size: Some(Vec2::new(20.0, 20.0)), // Assuming each object is 20x20
                         ..Default::default()
                     },
                     transform: Transform {
-                        translation: Vec3::new(object.x, -object.y, 1.0), // Adjust as needed
+                        translation: Vec3::new(object.x, -object.y, MAP.layers.len() as f32), // Place objects on top
                         ..Default::default()
                     },
                     ..Default::default()
